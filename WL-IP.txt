@@ -1,0 +1,29 @@
+To blacklist a list of IP addresses from a domain using Cloudflare API, you can follow these steps:
+
+Generate an API token with the necessary permissions to make changes to your Cloudflare account. You can do this by going to your Cloudflare dashboard, selecting your profile, and then clicking on "API Tokens". Click on "Create Token" and select the appropriate permissions for your use case.
+
+Once you have your API token, you can use it to make requests to the Cloudflare API. In this case, you will want to use the "Firewall Rules" API endpoint.
+
+First, you'll need to retrieve the zone ID of the domain you want to blacklist IPs for. You can do this by making a GET request to the "Zones" endpoint and specifying the domain name as a parameter.
+
+Here's an example cURL command:
+
+curl -X GET "https://api.cloudflare.com/client/v4/zones?name=example.com" \
+-H "Authorization: Bearer API_TOKEN" \
+-H "Content-Type: application/json"
+
+Replace "API_TOKEN" with your own API token.
+
+The response should include the zone ID for your domain. You'll need to save this value for use in the next step.
+
+Next, you can create a new firewall rule that will block incoming traffic from the IP addresses you specify. Here's an example cURL command:
+
+curl -X POST "https://api.cloudflare.com/client/v4/zones/ZONE_ID/firewall/rules" \
+-H "Authorization: Bearer API_TOKEN" \
+-H "Content-Type: application/json" \
+--data '{"filter":{"expression":"ip.src in {1.2.3.4 5.6.7.8}"}, "action":"block", "description":"Blacklist IPs"}'
+
+Replace "API_TOKEN" with your own API token and "ZONE_ID" with the zone ID you retrieved in the previous step. Replace "1.2.3.4 5.6.7.8" with a space-separated list of the IP addresses you want to block.
+
+The response should include the ID of the new firewall rule. You can use this ID to modify or delete the rule later if needed.
+Note that creating a firewall rule will apply to all incoming traffic to your domain. Make sure that you test the rule thoroughly and consider any potential impact on legitimate traffic before implementing it.
